@@ -11,12 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SASpriteGen.Wpf
 {
@@ -31,8 +25,14 @@ namespace SASpriteGen.Wpf
 		{
 			InitializeComponent();
 			DataContext = new MainWindowViewModel(RegisterCollectionSynchronization);
+			Width = SystemParameters.WorkArea.Width * 0.75;
+			Height = SystemParameters.WorkArea.Height * 0.75;
+
+			var version = GetType().Assembly.GetName().Version;
+			Title = $"HOMM3 HD sprite to Stream Avatars sprite sheet converter {version.Major}.{version.Minor}.{version.Build}";
 		}
 
+		
 		private void RegisterCollectionSynchronization(IEnumerable collection, object lockObject)
 		{
 			Dispatcher.Invoke(() => BindingOperations.EnableCollectionSynchronization(collection, lockObject));

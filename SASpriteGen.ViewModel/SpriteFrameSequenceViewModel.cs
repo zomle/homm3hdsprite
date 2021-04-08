@@ -1,7 +1,9 @@
-﻿using ImageMagick;
+﻿using SASpriteGen.Model.Def;
+using SASpriteGen.Model.Pak;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace SASpriteGen.ViewModel
 {
@@ -25,105 +27,20 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		private int frameWidth;
-		public int FrameWidth
-		{
-			get
-			{
-				return frameWidth;
-			}
-			set
-			{
-				if (frameWidth != value)
-				{
-					frameWidth = value;
-					NotifyPropertyChanged();
-				}
-			}
-		}
-
-		private int frameHeight;
-		public int FrameHeight
-		{
-			get
-			{
-				return frameHeight;
-			}
-			set
-			{
-				if (frameHeight != value)
-				{
-					frameHeight = value;
-					NotifyPropertyChanged();
-				}
-			}
-		}
-
-		//private double scalex;
-		//public double ScaleX
-		//{
-		//	get
-		//	{
-		//		return scalex;
-		//	}
-		//	set
-		//	{
-		//		if (scalex != value)
-		//		{
-		//			scalex = Math.Round(value, 2);
-		//			NotifyPropertyChanged();
-		//		}
-		//	}
-		//}
-
-		//private double scaley;
-		//public double ScaleY
-		//{
-		//	get
-		//	{
-		//		return scaley;
-		//	}
-		//	set
-		//	{
-		//		if (scaley != value)
-		//		{
-		//			scaley = Math.Round(value, 2);
-		//			NotifyPropertyChanged();
-		//		}
-		//	}
-		//}
+		public DefAnimation SequenceType { get; set; }
 
 		public ObservableCollection<SpriteFrameData> Data { get; set; }
 
-		public Command<SpriteFrameData> IncreaseXOffset { get; set; }
-		public Command<SpriteFrameData> DecreaseXOffset { get; set; }
-		public Command<SpriteFrameData> IncreaseYOffset { get; set; }
-		public Command<SpriteFrameData> DecreaseYOffset { get; set; }
+		public AnimationPreviewViewModel AnimationPreview { get; set; }
 
-		public Command<SpriteFrameData> ResetOffsets { get; set; }
+		public Command<FramedImageViewModel> ResetOffsets { get; set; }
 
 		public Command StepAnimationBackward { get; set; }
 		public Command StepAnimationForward { get; set; }
 		public Command ToggleAnimation { get; set; }
 
-		private int currentPreviewFrameIndex;
-		public int CurrentPreviewFrameIndex
-		{
-			get
-			{
-				return currentPreviewFrameIndex;
-			}
-			set
-			{
-				if (value != currentPreviewFrameIndex)
-				{
-					currentPreviewFrameIndex = value;
-					NotifyPropertyChanged();
-				}
-			}
-		}
-
-		public bool AnimationRunning { get; set; }
+		public int FrameMinLeft { get; internal set; }
+		public int FrameMinTop { get; internal set; }
 
 		public SpriteFrameSequenceViewModel(Action<IEnumerable, object> registerCollectionSynchronization) 
 			: base(registerCollectionSynchronization)
@@ -132,90 +49,77 @@ namespace SASpriteGen.ViewModel
 
 			RegisterCollectionSynchronization(Data);
 
-			IncreaseXOffset = new Command<SpriteFrameData>((data) => { ChangeOffset(data, +1, 0); });
-			DecreaseXOffset = new Command<SpriteFrameData>((data) => { ChangeOffset(data, -1, 0); });
-			IncreaseYOffset = new Command<SpriteFrameData>((data) => { ChangeOffset(data, 0, +1); });
-			DecreaseYOffset = new Command<SpriteFrameData>((data) => { ChangeOffset(data, 0, -1); });
+			AnimationPreview = new AnimationPreviewViewModel(Data);
 
-			ResetOffsets = new Command<SpriteFrameData>(ResetOffsetsToDefault);
+			ResetOffsets = new Command<FramedImageViewModel>(ResetOffsetsToDefault);
 
-			ToggleAnimation = new Command(() => { AnimationRunning = !AnimationRunning; });
-			StepAnimationForward = new Command(() => { AnimationRunning = false; StepPreviewFrame(1); });
-			StepAnimationBackward = new Command(() => { AnimationRunning = false; StepPreviewFrame(-1); });
+			ToggleAnimation = new Command(() => { AnimationPreview.AnimationRunning = !AnimationPreview.AnimationRunning; });
+			StepAnimationForward = new Command(() => { AnimationPreview.AnimationRunning = false; AnimationPreview.StepPreviewFrame(1); });
+			StepAnimationBackward = new Command(() => { AnimationPreview.AnimationRunning = false; AnimationPreview.StepPreviewFrame(-1); });
 
-			AnimationRunning = false;
+			AnimationPreview.AnimationRunning = false;
 		}
 
-
-		public void AddNewFrame(MagickImage image, double offsetX, double offsetY, double highResScaleX, double highResScaleY, double scaleX, double scaleY)
+		private void AddNewFrame(FramedImageViewModel framedImage)
 		{
-			Data.Add(new SpriteFrameData(Data.Count, image, offsetX, offsetY, highResScaleX, highResScaleY, scaleX, scaleY));
-		}
-
-		public void AnimationTick()
-		{
-			if (!AnimationRunning)
-			{
-				return;
-			}
-
-			if (Data.Count == 0)
-			{
-				return;
-			}
-
-			StepPreviewFrame(1);
-		}
-
-		public void StepPreviewFrame(int delta)
-		{
-			if (Data.Count == 0)
-			{
-				return;
-			} 
-			else if (CurrentPreviewFrameIndex >= Data.Count)
-			{
-				CurrentPreviewFrameIndex = Data.Count - 1;
-			}
-
-			Data[CurrentPreviewFrameIndex].CurrentPreviewFrame = false;
-
-			var val = CurrentPreviewFrameIndex + delta;
 			
-			if (val >= Data.Count)
-			{
-				CurrentPreviewFrameIndex = 0;
-			} 
-			else if (val < 0)
-			{
-				CurrentPreviewFrameIndex = Data.Count - 1;
-			}
-			else
-			{
-				CurrentPreviewFrameIndex = val;
-			}
-			
-			Data[CurrentPreviewFrameIndex].CurrentPreviewFrame = true;
+			Data.Add(new SpriteFrameData(Data.Count, framedImage));
 		}
 
-		private void ResetOffsetsToDefault(SpriteFrameData data)
+		private void ResetOffsetsToDefault(FramedImageViewModel data)
 		{
-			data.OffsetX = data.OriginalOffsetX;
-			data.OffsetY = data.OriginalOffsetY;
-		}
-
-		private void ChangeOffset(SpriteFrameData data, int dx, int dy)
-		{
-			data.OffsetX += dx;
-			data.OffsetY += dy;
+			data.ResetOffsetsToDefault();
 		}
 
 		internal void Clear()
 		{
-			AnimationRunning = false;
-			CurrentPreviewFrameIndex = 0;
+			AnimationPreview.AnimationRunning = false;
+			AnimationPreview.CurrentPreviewFrameIndex = 0;
 
+			var dataArray = Data.ToArray();
 			Data.Clear();
+
+			foreach (var data in dataArray)
+			{
+				data.Dispose();
+			}
+		}
+
+		internal void ChangeFrameSize(int dx, int dy)
+		{
+			foreach (var data in Data)
+			{
+				if (dx != 0)
+				{
+					data.FramedImage.FrameWidth += dx;
+				}
+
+				if (dy != 0)
+				{
+					data.FramedImage.FrameHeight += dy;
+				}
+			}
+		}
+
+		internal void AddNewFrame(DefGroupItem defItem, HdPakFrame frame, int targetFrameWidth, int targetFrameHeight, double scale)
+		{
+			var framedImage = new FramedImageViewModel(defItem, frame.Image, Data.Count == 0 ? null : Data[0].FramedImage, scale)
+			{
+				FrameWidth = targetFrameWidth,
+				FrameHeight = targetFrameHeight
+			};
+
+			AddNewFrame(framedImage);
+		}
+
+		internal void ResetSizeAndScaling(int originalFrameWidth, int originalFrameHeight, double originalScale)
+		{
+			foreach (var data in Data)
+			{
+				data.FramedImage.FrameWidth = originalFrameWidth;
+				data.FramedImage.FrameHeight = originalFrameHeight;
+				data.FramedImage.Scale = originalScale;
+			}
 		}
 	}
 }

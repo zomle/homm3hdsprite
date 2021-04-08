@@ -1,15 +1,36 @@
-﻿namespace SASpriteGen.Model
+﻿using System.Collections.Generic;
+
+namespace SASpriteGen.Model
 {
-	public enum Animation
+	public class Animation
 	{
-		Idle,
-		Run,
-		Sit,
-		Stand,
-		Jump,
-		Hug,
-		Dance,
-		Attack,
-		Fart
+		public string Name { get; }
+		public string Source { get; }
+
+		public int TotalHeight
+		{
+			get
+			{
+				return Frames.Count > 0 ? Frames[0].FrameHeight : 0;
+			}
+		}
+
+		public int TotalWidth
+		{
+			get
+			{
+				return Frames.Count * Frames[0].FrameWidth;
+			}
+		}
+
+		public readonly List<Frame> Frames;
+
+		public Animation(string name, string source)
+		{
+			Name = name;
+			Source = source;
+
+			Frames = new List<Frame>();
+		}
 	}
 }

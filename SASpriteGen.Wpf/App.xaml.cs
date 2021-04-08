@@ -13,5 +13,6 @@ namespace SASpriteGen.Wpf
 	/// </summary>
 	public partial class App : Application
 	{
+
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using SASpriteGen.ViewModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,6 +12,8 @@ namespace SASpriteGen.Wpf
 	/// </summary>
 	public partial class HdAssetCatalogBrowser : UserControl
 	{
+		private const string Homm3HdSteamDefaultDir = @"C:\Program Files (x86)\Steam\steamapps\common\Heroes of Might & Magic III - HD Edition\data";
+
 		public HdAssetCatalogBrowserViewModel ViewModel { get => (HdAssetCatalogBrowserViewModel)DataContext; }
 
 		public HdAssetCatalogBrowser()
@@ -18,15 +21,19 @@ namespace SASpriteGen.Wpf
 			InitializeComponent();
 		}
 
-
 		private void BrowseLodFileButton_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog ofd = new OpenFileDialog()
 			{
 				Filter = "HOMM3 sprite lod file (h3sprite.lod)|h3sprite.lod|HOMM3 HD Edition lod file (*.lod)|*.lod|All files (*.*)|*.*",
 				Title = "Open lod file",
-				CheckFileExists = true
+				CheckFileExists = true,
 			};
+
+			if (Directory.Exists(Homm3HdSteamDefaultDir))
+			{
+				ofd.InitialDirectory = Homm3HdSteamDefaultDir;
+			}
 
 			if (ofd.ShowDialog() == true)
 			{

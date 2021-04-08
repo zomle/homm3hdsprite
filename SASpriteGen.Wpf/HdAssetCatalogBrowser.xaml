@@ -59,7 +59,6 @@
 			</Grid>
 			</StackPanel>
 		</GroupBox>
-		
 
 		<Grid Grid.Row="1" Margin="3">
 			<ListView ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">

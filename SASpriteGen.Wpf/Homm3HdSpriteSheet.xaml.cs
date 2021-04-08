@@ -1,7 +1,5 @@
 ﻿using SASpriteGen.ViewModel;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace SASpriteGen.Wpf
 {
@@ -15,16 +13,6 @@ namespace SASpriteGen.Wpf
 		public Homm3HdSpriteSheet()
 		{
 			InitializeComponent();
-
-			Loaded += SpriteSheet_Loaded;
-		}
-
-		private void SpriteSheet_Loaded(object sender, RoutedEventArgs e)
-		{
-			//if (ViewModel != null)
-			//{
-			//	BindingOperations.EnableCollectionSynchronization(ViewModel.Sequences, ViewModel.SynchronizationLock);
-			//}
 		}
 	}
 }

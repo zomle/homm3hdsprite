@@ -5,50 +5,105 @@ using SASpriteGen.Model.Pak;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 
 namespace SASpriteGen.ViewModel
 {
-
 	public class Homm3HdSpriteSheetViewModel : SynchedViewModel
 	{
 		public int OriginalFrameWidth { get; set; }
 		public int OriginalFrameHeight { get; set; }
-		public double OriginalScaleX { get; set; }
-		public double OriginalScaleY { get; set; }
+		public double OriginalScale { get; set; }
 
 		public int FrameWidth
 		{
-			get { return Sequences.Count == 0 ? 0 : Sequences[0].FrameWidth; }
+			get { return Sequences.Count == 0 || Sequences[0].Data.Count == 0 ? 0 : Sequences[0].Data[0].FramedImage.FrameWidth; }
 			set { throw new InvalidOperationException(); }
 		}
 
 		public int FrameHeight
 		{
-			get { return Sequences.Count == 0 ? 0 : Sequences[0].FrameHeight; }
+			get { return Sequences.Count == 0 || Sequences[0].Data.Count == 0 ? 0 : Sequences[0].Data[0].FramedImage.FrameHeight; }
 			set { throw new InvalidOperationException(); }
 		}
 
 		public double Scaling
 		{
-			get { return (Sequences.Count == 0 || Sequences[0].Data.Count == 0) ? 0 : Sequences[0].Data[0].ScaleX; }
+			get { return (Sequences.Count == 0 || Sequences[0].Data.Count == 0) ? 0 : Sequences[0].Data[0].FramedImage.Scale; }
 			set { throw new InvalidOperationException(); }
 		}
 
-		public Command IncreaseFrameWidth { get; set; }
-		public Command DecreaseFrameWidth { get; set; }
+		private int frameCount;
+		public int FrameCount
+		{
+			get { return frameCount; }
+			set
+			{
+				if (frameCount != value)
+				{
+					frameCount = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
 
-		public Command IncreaseFrameHeight { get; set; }
-		public Command DecreaseFrameHeight { get; set; }
+		private int framesProcessed;
+		public int FramesProcessed
+		{
+			get { return framesProcessed; }
+			set
+			{
+				if (framesProcessed != value)
+				{
+					framesProcessed = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
 
-		public Command IncreaseScaling { get; set; }
-		public Command DecreaseScaling { get; set; }
+		private bool frameLoadInProgress;
+		public bool FrameLoadInProgress
+		{
+			get
+			{
+				return frameLoadInProgress;
+			}
+			set
+			{
+				if (frameLoadInProgress != value)
+				{
+					frameLoadInProgress = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
+
+		private bool sequencesLoaded;
+		public bool SequencesLoaded
+		{
+			get
+			{
+				return sequencesLoaded;
+			}
+			set
+			{
+				if (sequencesLoaded != value)
+				{
+					sequencesLoaded = value;
+					NotifyPropertyChanged();
+				}
+			}
+		}
+
+		public Command<string> ChangeFrameWidth { get; set; }
+		public Command<string> ChangeFrameHeight { get; set; }
+		public Command<string> ChangeScaling { get; set; }
 
 		public Command ResetSizing { get; set; }
 		public Command RecalculateFrameSize { get; set; }
+
+		public Command Unload { get; set; }
 
 		public ObservableCollection<SpriteFrameSequenceViewModel> Sequences { get; set; }
 
@@ -59,76 +114,111 @@ namespace SASpriteGen.ViewModel
 
 			RegisterCollectionSynchronization(Sequences);
 
-			IncreaseFrameWidth = new Command(() =>
+			ChangeFrameWidth = new Command<string>((arg) =>
 			{
-				Sequences.ForAll(s => s.FrameWidth += 1);
+				var dw = Convert.ToInt32(arg);
+				Sequences.ForAll(s => s.ChangeFrameSize(dw, 0));
 				NotifyPropertyChanged(nameof(FrameWidth));
+				FrameSizesUpdated?.Invoke(this, new FrameSizesUpdatedEventArgs());
 			});
 
-			DecreaseFrameWidth = new Command(() =>
+			ChangeFrameHeight = new Command<string>((arg) =>
 			{
-				Sequences.ForAll(s => s.FrameWidth -= 1);
-				NotifyPropertyChanged(nameof(FrameWidth));
-			});
-
-			IncreaseFrameHeight = new Command(() =>
-			{
-				Sequences.ForAll(s => s.FrameHeight += 1);
+				var dh = Convert.ToInt32(arg);
+				Sequences.ForAll(s => s.ChangeFrameSize(0, dh));
 				NotifyPropertyChanged(nameof(FrameHeight));
+				FrameSizesUpdated?.Invoke(this, new FrameSizesUpdatedEventArgs());
 			});
 
-			DecreaseFrameHeight = new Command(() =>
+			ChangeScaling = new Command<string>((arg) =>
 			{
-				Sequences.ForAll(s => s.FrameHeight -= 1);
-				NotifyPropertyChanged(nameof(FrameHeight));
-			});
-
-			IncreaseScaling = new Command(() =>
-			{
-				Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleX += 0.01));
-				Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleY += 0.01));
-				NotifyPropertyChanged(nameof(Scaling));
-			});
-
-			DecreaseScaling = new Command(() =>
-			{
-				Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleX -= 0.01));
-				Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleY -= 0.01));
+				var ds = Convert.ToDouble(arg);
+				Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.Scale += ds));
 				NotifyPropertyChanged(nameof(Scaling));
 			});
 
 			ResetSizing = new Command(() =>
 			{
-				Sequences.ForAll(s => s.FrameWidth = OriginalFrameWidth);
-				Sequences.ForAll(s => s.FrameHeight = OriginalFrameHeight);
-				Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleX = OriginalScaleX));
-				Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleY = OriginalScaleY));
+				Sequences.ForAll(s => s.ResetSizeAndScaling(OriginalFrameWidth, OriginalFrameHeight, OriginalScale));
 
 				NotifyPropertyChanged(nameof(FrameWidth));
 				NotifyPropertyChanged(nameof(FrameHeight));
 				NotifyPropertyChanged(nameof(Scaling));
+
+				FrameSizesUpdated?.Invoke(this, new FrameSizesUpdatedEventArgs());
 			});
 
 			RecalculateFrameSize = new Command(() =>
 			{
-				var maxWidth = (int)Math.Ceiling(Sequences.Max(s => s.Data.Max(d => d.Width * d.ScaleX)));
-				var maxHeight = (int)Math.Ceiling(Sequences.Max(s => s.Data.Max(d => d.Height * d.ScaleY)));
+				int leftest = int.MaxValue;
+				int rightest = int.MinValue;
 
-				Sequences.ForAll(s => s.FrameWidth = maxWidth);
-				Sequences.ForAll(s => s.FrameHeight = maxHeight);
+				int topest = int.MaxValue;
+				int bottomest = int.MinValue;
+				foreach (var sequence in Sequences)
+				{
+					foreach (var data in sequence.Data)
+					{
+						var left = (int)(data.FramedImage.OffsetX - data.FramedImage.Width/2 * data.FramedImage.Scale);
+						var right = (int)(data.FramedImage.OffsetX + data.FramedImage.Width/2 * data.FramedImage.Scale);
+
+						var bottom = (int)(data.FramedImage.OffsetY + data.FramedImage.Height * data.FramedImage.Scale);
+						var top = (int)(data.FramedImage.OffsetY);
+
+						leftest = leftest < left ? leftest : left;
+						rightest = rightest > right ? rightest : right;
+
+						bottomest = bottomest > bottom ? bottomest : bottom;
+						topest = topest < top ? topest : top;
+					}
+				}
+
+				var maxWidth = rightest - leftest;
+				var maxHeight = bottomest - topest;
+
+				Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.FrameWidth = maxWidth));
+				Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.FrameHeight = maxHeight));
+
+				NotifyPropertyChanged(nameof(FrameWidth));
+				NotifyPropertyChanged(nameof(FrameHeight));
+
+				FrameSizesUpdated?.Invoke(this, new FrameSizesUpdatedEventArgs());
 			});
 
+			Initialize();
+
+			Unload = new Command(() =>
+			{
+				SequencesLoaded = false;
+				Clear();
+			});
+		}
+
+		private void Initialize()
+		{
 			OriginalFrameHeight = 200;
 			OriginalFrameWidth = 200;
-			OriginalScaleX = 1.00;
-			OriginalScaleY = 1.0;
+			OriginalScale = 1.0;
 
-			Sequences.ForAll(s => s.FrameWidth = OriginalFrameWidth);
-			Sequences.ForAll(s => s.FrameHeight = OriginalFrameHeight);
+			Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.FrameWidth = OriginalFrameWidth));
+			Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.FrameHeight = OriginalFrameHeight));
 
-			Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleX = OriginalScaleX));
-			Sequences.ForAll(s => s.Data.ForAll(d => d.ScaleY = OriginalScaleY));
+			Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.Scale = OriginalScale));
 		}
+
+		public void RefreshFrameSizes()
+		{
+			NotifyPropertyChanged(nameof(FrameWidth));
+			NotifyPropertyChanged(nameof(FrameHeight));
+		}
+
+		public delegate void SequenceCollectionUpdatedEventHandler(object sender, SequenceCollectionUpdatedEventArgs e);
+		public event SequenceCollectionUpdatedEventHandler SequenceCollectionUpdated;
+
+		public delegate void FrameSizesUpdatedEventHandler(object sender, FrameSizesUpdatedEventArgs e);
+		public event FrameSizesUpdatedEventHandler FrameSizesUpdated;
+
+		private HdAssetCatalogItem LoadedCatalogItem { get; set; }
 
 		public void Load(DefFile defFile, HdAssetCatalogItem catalogItem)
 		{
@@ -140,18 +230,25 @@ namespace SASpriteGen.ViewModel
 		private void LoadSpriteSheetThreadFunc(DefFile defFile, HdAssetCatalogItem catalogItem)
 		{
 			double minScale = double.MaxValue;
+			FrameLoadInProgress = true;
+			SequencesLoaded = false;
+			FramesProcessed = 0;
+
+			FrameCount = catalogItem.HdPakFrames.Count;
+
+			catalogItem.LoadFrames(() => FramesProcessed++);
+
 			foreach (var group in defFile.Groups)
 			{
 				foreach (var item in group.Value.Items)
 				{
-					var frameId = Path.GetFileNameWithoutExtension(item.FileName).ToUpper();
-					if (!catalogItem.HdPakFrames.TryGetValue(frameId, out var frame))
+					var frame = catalogItem.GetFrameForFileName(item.FileName);
+					if (frame == null) 
 					{
 						continue;
 					}
 
-					var image = frame.GetImage();
-
+					var image = frame.Image;
 					var scaleX = (double)OriginalFrameWidth / image.Width;
 					var scaleY = (double)OriginalFrameHeight / image.Height;
 					var tmpScale = Math.Min(scaleX, scaleY);
@@ -159,56 +256,61 @@ namespace SASpriteGen.ViewModel
 					minScale = Math.Min(minScale, tmpScale);
 				}
 			}
+			minScale = Math.Min(1.0, minScale);
 
-			OriginalScaleX = minScale;
-			OriginalScaleY = minScale;
+			OriginalScale = minScale;
 
 			foreach (var group in defFile.Groups)
 			{
-				var ix = AddSequence(group.Value.GetGroupName(defFile.Type));
+				var ix = AddSequence(group.Value.GetGroupName(defFile.Type), group.Value.GroupNum);
 				var sequence = Sequences[ix];
 
-				var leftest = group.Value.Items.Min(v => v.FrameLeft);
-				var topest = group.Value.Items.Min(v => v.FrameTop);
+				sequence.FrameMinLeft = group.Value.Items.Min(v => v.FrameLeft);
+				sequence.FrameMinTop = group.Value.Items.Min(v => v.FrameTop);
 
-				Debug.WriteLine($"Group: {ix}; Leftest: {leftest}; Topest: {topest}");
-
-				foreach (var item in group.Value.Items)
+				for (int i = 0; i < group.Value.Items.Count; i++)
 				{
-					var frameId = Path.GetFileNameWithoutExtension(item.FileName).ToUpper();
-					if (!catalogItem.HdPakFrames.TryGetValue(frameId, out var frame))
+					var item = group.Value.Items[i];
+
+					var frame = catalogItem.GetFrameForFileName(item.FileName);
+					if (frame == null)
 					{
 						continue;
 					}
 
-					var image = frame.GetImage();
-
-					int frameIx = sequence.Data.Count;
-					Debug.WriteLine($"Group: {ix}; Frame: {frameIx}; Image Width: {image.Width}; Image Height: {image.Height}");
-					Debug.WriteLine($"Group: {ix}; Frame: {frameIx}; Frame Top: {item.FrameTop}; Frame Left: {item.FrameLeft}; Frame Width: {item.FrameWidth}; Frame Height: {item.FrameHeight}; Width: {item.Width}; Height: {item.Height}");
-					Debug.WriteLine($"Group: {ix}; Frame: {frameIx}; {frame.Metadata.GetDebugString()}");
-
-					var highresScaleX = (double)image.Width / item.FrameWidth;
-					var highresScaleY = (double)image.Height / item.FrameHeight;
-
-					sequence.AddNewFrame(image, item.FrameLeft - leftest, item.FrameTop - topest, highresScaleX, highresScaleY, OriginalScaleX, OriginalScaleY);
+					sequence.AddNewFrame(item, frame, OriginalFrameWidth, OriginalFrameHeight, OriginalScale);
 				}
 
-				Sequences[ix].AnimationRunning = true;
+				if (sequence.Data.Count == 0)
+				{
+					Sequences.Remove(sequence);
+				}
 			}
+
+			Sequences.ForAll(s =>
+			{
+				s.AnimationPreview.AnimationRunning = true;
+				Thread.Sleep(1);
+			});
 
 			NotifyPropertyChanged(nameof(FrameWidth));
 			NotifyPropertyChanged(nameof(FrameHeight));
 			NotifyPropertyChanged(nameof(Scaling));
+
+			SequenceCollectionUpdated?.Invoke(this, new SequenceCollectionUpdatedEventArgs(Sequences));
+
+			LoadedCatalogItem = catalogItem;
+
+			FrameLoadInProgress = false;
+			SequencesLoaded = true;
 		}
 
-		public int AddSequence(string sequenceName)
+		public int AddSequence(string sequenceName, DefAnimation sequenceType)
 		{
 			Sequences.Add(new SpriteFrameSequenceViewModel(RegisterCollectionSynchronizationCallback)
 			{
 				SequenceName = sequenceName,
-				FrameWidth = OriginalFrameWidth,
-				FrameHeight = OriginalFrameHeight,
+				SequenceType = sequenceType
 			});
 			return Sequences.Count - 1;
 		}
@@ -221,6 +323,10 @@ namespace SASpriteGen.ViewModel
 			}
 
 			Sequences.Clear();
+
+			LoadedCatalogItem?.DisposeImages();
+
+			Initialize();
 		}
 	}
 }

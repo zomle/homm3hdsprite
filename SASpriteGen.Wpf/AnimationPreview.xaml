@@ -8,48 +8,21 @@
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<ResourceDictionary>
-			<BooleanToVisibilityConverter x:Key="bool2vis" />
-			<converter:BottomCenterConverter x:Key="BottomCenterConverter" />
-			<converter:ScaledOffsetConverter x:Key="ScaledOffsetConverter" />
+			<converter:FrameIndexToVisibilityConverter x:Key="FrameIndexToVisibilityConverter" />
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
 		<ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Data}">
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
-					<Border Visibility="{Binding CurrentPreviewFrame, Converter={StaticResource bool2vis}}" BorderBrush="Black" Background="LemonChiffon" BorderThickness="1">
-						<Grid Width="{Binding DataContext.FrameWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-								  Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
-							<Border BorderThickness="1"  BorderBrush="DarkGray">
-								<Canvas Width="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-											Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" >
-									<Image Stretch="None" Source="{Binding ImageStream}">
-										<Image.RenderTransform>
-											<TransformGroup>
-												<ScaleTransform ScaleX="{Binding ScaleX}"  
-																	ScaleY="{Binding ScaleY}" />
-												<TranslateTransform>
-													<TranslateTransform.X>
-														<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
-															<Binding Path="ScaleX" />
-															<Binding Path="HighResScaleX" />
-															<Binding Path="OffsetX" />
-														</MultiBinding>
-													</TranslateTransform.X>
-													<TranslateTransform.Y>
-														<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
-															<Binding Path="ScaleY" />
-															<Binding Path="HighResScaleY" />
-															<Binding Path="OffsetY" />
-														</MultiBinding>
-													</TranslateTransform.Y>
-												</TranslateTransform>
-											</TransformGroup>
-										</Image.RenderTransform>
-									</Image>
-								</Canvas>
-							</Border>
-						</Grid>
+					<Border BorderBrush="Black" Background="LemonChiffon" BorderThickness="1">
+						<Border.Visibility>
+							<MultiBinding Converter="{StaticResource FrameIndexToVisibilityConverter}">
+								<Binding Path="DataContext.CurrentPreviewFrameIndex" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+								<Binding Path="FrameIndex" />
+							</MultiBinding>
+						</Border.Visibility>
+						<local:FramedImage DataContext="{Binding FramedImage}" />
 					</Border>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>

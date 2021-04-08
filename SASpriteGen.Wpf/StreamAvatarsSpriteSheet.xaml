@@ -4,111 +4,231 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SASpriteGen.Wpf" 
-			 xmlns:converter="clr-namespace:SASpriteGen.Wpf.Converters"
 			 mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<BooleanToVisibilityConverter x:Key="bool2vis" />
-			<converter:BottomCenterConverter x:Key="BottomCenterConverter" />
-			<converter:ScaledOffsetConverter x:Key="ScaledOffsetConverter" />
 		</ResourceDictionary>
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="200" />
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<GroupBox Grid.Row="0" Header="Preview">
+		<GroupBox Grid.Row="0" Header="Preview" Background="Lavender">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
 
+				<local:AnimationPreview Grid.Column="0" MinWidth="150" DataContext="{Binding ActiveAction.SelectedSequence.AnimationPreview}"/>
+
+				<StackPanel Grid.Column="1" Margin="10,0">
+					<!--<RadioButton  Style="{StaticResource {x:Type ToggleButton}}" />-->
+					<RadioButton Content="Idle" Command="{Binding ChangeAction}" CommandParameter="Idle" IsChecked="True" Style="{StaticResource {x:Type ToggleButton}}"/>
+					<RadioButton Content="Run" Command="{Binding ChangeAction}" CommandParameter="Run" Style="{StaticResource {x:Type ToggleButton}}"/>
+					<RadioButton Content="Sit" Command="{Binding ChangeAction}" CommandParameter="Sit" Style="{StaticResource {x:Type ToggleButton}}"/>
+					<RadioButton Content="Stand" Command="{Binding ChangeAction}" CommandParameter="Stand" Style="{StaticResource {x:Type ToggleButton}}"/>
+					<RadioButton Content="Jump" Command="{Binding ChangeAction}" CommandParameter="Jump" Style="{StaticResource {x:Type ToggleButton}}"/>
+					<RadioButton Content="Attack" Command="{Binding ChangeAction}" CommandParameter="Attack" Style="{StaticResource {x:Type ToggleButton}}"/>
+				</StackPanel>
+
+				<Grid Grid.Column="2">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<Grid Grid.Row="0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						
+						<StackPanel Grid.Column="0" Orientation="Horizontal">
+							<TextBlock VerticalAlignment="Center" Margin="4">Frame width:</TextBlock>
+							<Button Margin="1,4" Padding="8,0"
+								Content="--" ToolTip="Decrease frame width by 5 pixels." 
+								Command="{Binding ChangeFrameWidth}" CommandParameter="-5" />
+
+							<Button Margin="1,4" Padding="8,0"
+								Content="-" ToolTip="Decrease frame width by 1 pixel."
+								Command="{Binding ChangeFrameWidth}" CommandParameter="-1" />
+
+							<Button Margin="5,4,1,4" Padding="8,0" 
+								Content="+" ToolTip="Increase frame width by 1 pixel."  
+								Command="{Binding ChangeFrameWidth}" CommandParameter="+1" />
+
+							<Button Margin="1,4" Padding="8,0" 
+								Content="++" ToolTip="Increase frame width by 5 pixels." 
+								Command="{Binding ChangeFrameWidth}" CommandParameter="+5" />
+						</StackPanel>
+
+						<StackPanel Grid.Column="1" Margin="15,0" Orientation="Horizontal" >
+							<TextBlock VerticalAlignment="Center" Margin="4">Frame height:</TextBlock>
+							<Button Margin="1,4" Padding="8,0"
+									Content="--" ToolTip="Decrease frame height by 5 pixels." 
+									Command="{Binding ChangeFrameHeight}" CommandParameter="-5" />
+
+							<Button Margin="1,4" Padding="8,0"
+									Content="-" ToolTip="Decrease frame height by 1 pixel."
+									Command="{Binding ChangeFrameHeight}" CommandParameter="-1" />
+
+							<Button Margin="5,4,1,4" Padding="8,0" 
+									Content="+" ToolTip="Increase frame height by 1 pixel."  
+									Command="{Binding ChangeFrameHeight}" CommandParameter="+1" />
+
+							<Button Margin="1,4" Padding="8,0" 
+									Content="++" ToolTip="Increase frame height by 5 pixels." 
+									Command="{Binding ChangeFrameHeight}" CommandParameter="+5" />
+						</StackPanel>
+
+						<Button Grid.Column="2" Margin="2" Content="Adjust frame size to fit animation" Command="{Binding AdjustFrameSizeToAnimation}"/>
+					</Grid>
+
+					<StackPanel Grid.Row="1" Orientation="Horizontal">
+						<TextBlock Margin="4,3,10,3">
+							<Run>Frame width:</Run>
+							<Run FontStyle="Italic" Text="{Binding FrameWidth}"></Run>
+						</TextBlock>
+
+						<TextBlock Margin="4,3,10,3">
+							<Run>Frame height:</Run>
+							<Run FontStyle="Italic" Text="{Binding FrameHeight}"></Run>
+						</TextBlock>
+
+						<TextBlock Margin="4,3,10,3">
+							<Run>SpriteSheet width:</Run>
+							<Run FontStyle="Italic" Text="{Binding SpriteSheetWidth}"></Run>
+						</TextBlock>
+
+						<TextBlock Margin="4,3,10,3">
+							<Run>SpriteSheet height:</Run>
+							<Run FontStyle="Italic" Text="{Binding SpriteSheetHeight}"></Run>
+						</TextBlock>
+					</StackPanel>
+
+					<Grid Grid.Row="3">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<TextBlock Grid.Row="0" Margin="0,5" TextWrapping="Wrap" Foreground="MidnightBlue" Text="{Binding Message}"/>
+						<Button Grid.Row="1" Width="150" HorizontalAlignment="Left" Content="Export as sprite sheet" Click="ExportAsSpriteSheet_Click"  />
+					</Grid>
+					
+				</Grid>
+			</Grid>
 		</GroupBox>
-		<ItemsControl Grid.Row="1" ItemsSource="{Binding Sequences}">
-			<ItemsControl.ItemTemplate>
+		<ListView Grid.Row="1" ItemsSource="{Binding AvatarActions}">
+			<ListView.ItemsPanel>
+				<ItemsPanelTemplate>
+					<WrapPanel MaxWidth="{Binding (FrameworkElement.ActualWidth), RelativeSource={RelativeSource AncestorType=ScrollContentPresenter}}"
+								   ItemWidth="{Binding (ListView.View).ItemWidth, RelativeSource={RelativeSource AncestorType=ListView}}"
+								   ItemHeight="{Binding (ListView.View).ItemHeight, RelativeSource={RelativeSource AncestorType=ListView}}" />
+				</ItemsPanelTemplate>
+			</ListView.ItemsPanel>
+			<ListView.ItemTemplate>
 				<DataTemplate>
-					<GroupBox>
+					<GroupBox MinWidth="500" VerticalAlignment="Top">
 						<GroupBox.Header>
 							<CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" IsEnabled="{Binding IsOptional}" />
 						</GroupBox.Header>
 						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto"/>
 								<ColumnDefinition />
 							</Grid.ColumnDefinitions>
 
-							<ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Data}">
-								<ItemsControl.ItemTemplate>
-									<DataTemplate>
-										<Border Visibility="{Binding CurrentPreviewFrame, Converter={StaticResource bool2vis}}" BorderBrush="Black" Background="LemonChiffon" BorderThickness="1">
-											<Grid Width="{Binding DataContext.FrameWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-												  Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
-												<Border BorderThickness="1"  BorderBrush="DarkGray">
-													<Canvas Width="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-															Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" >
-														<Image Stretch="None" Source="{Binding ImageStream}">
-															<Image.RenderTransform>
-																<TransformGroup>
-																	<ScaleTransform ScaleX="{Binding DataContext.ScaleX, RelativeSource={RelativeSource AncestorType=ItemsControl}}"  
-																	ScaleY="{Binding DataContext.ScaleY, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
-																	<TranslateTransform>
-																		<TranslateTransform.X>
-																			<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
-																				<Binding Path="DataContext.ScaleX" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
-																				<Binding Path="HighResScaleX" />
-																				<Binding Path="OffsetX" />
-																			</MultiBinding>
-																		</TranslateTransform.X>
-																		<TranslateTransform.Y>
-																			<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
-																				<Binding Path="DataContext.ScaleY" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
-																				<Binding Path="HighResScaleY" />
-																				<Binding Path="OffsetY" />
-																			</MultiBinding>
-																		</TranslateTransform.Y>
-																	</TranslateTransform>
-																</TransformGroup>
-															</Image.RenderTransform>
-														</Image>
-													</Canvas>
-												</Border>
-											</Grid>
-										</Border>
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
+							<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+								<TextBlock Text="All frames: " ToolTip="Frame index" VerticalAlignment="Center" Margin="5,0,0,0"/>
 
-								<ItemsControl.Template>
-									<ControlTemplate TargetType="ItemsControl">
-										<ScrollViewer CanContentScroll="False" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden" >
-											<Grid>
-												<ItemsPresenter />
-											</Grid>
-										</ScrollViewer>
-									</ControlTemplate>
-								</ItemsControl.Template>
+								<Button Content="ᐸᐸ" ToolTip="Move all images 5 pixels left."
+										Command="{Binding AdjustAllXOffset}"
+										CommandParameter="-5"
+										Margin="0,2" Padding="2" />
 
-								<ItemsControl.ItemsPanel>
-									<ItemsPanelTemplate>
-										<Grid />
-									</ItemsPanelTemplate>
-								</ItemsControl.ItemsPanel>
-							</ItemsControl>
+								<Button Content="ᐸ" ToolTip="Move all image 1 pixel left."
+										Command="{Binding AdjustAllXOffset}"
+										CommandParameter="-1"
+										Margin="0,2" Padding="2" />
+
+								<Button Content="ᐳ" ToolTip="Move all images 1 pixel right."
+										Command="{Binding AdjustAllXOffset}"
+										CommandParameter="1"
+										Margin="2,2,0,2" Padding="2"/>
+
+								<Button Content="ᐳᐳ" ToolTip="Move all image 5 pixels right."
+										Command="{Binding AdjustAllXOffset}"
+										CommandParameter="5"
+										Margin="0,2" Padding="2"/>
+
+								<Button Content="Reset" ToolTip="Reset all image positioning to default, read from Homm3 sprite definition."
+										Command="{Binding ResetAllOffsets}"
+										Margin="8,2,8,2" Padding="2"/>
+
+								<Button Content="ᗑ" ToolTip="Move all images 5 pixels up."
+										Command="{Binding AdjustAllYOffset}"
+										CommandParameter="-5"
+										Margin="0,2" Padding="2"/>
+
+								<Button Content="ᐱ" ToolTip="Move all images 1 pixel up."
+										Command="{Binding AdjustAllYOffset}"
+										CommandParameter="-1"
+										Margin="0,2" Padding="2"/>
+
+								<Button Content="ᐯ" ToolTip="Move all images 1 pixel down."
+										Command="{Binding AdjustAllYOffset}"
+										CommandParameter="1"
+										Margin="2,2,0,2" Padding="2"/>
+
+								<Button Content="ᗐ" ToolTip="Move all image 5 pixels down."
+										Command="{Binding AdjustAllYOffset}"
+										CommandParameter="5"
+										Margin="0,2" Padding="2"/>
+							</StackPanel>
+
+							<local:AnimationPreview Grid.Row="1" Grid.Column="0" MinWidth="100" MinHeight="100" DataContext="{Binding SelectedSequence.AnimationPreview}"/>
+
+							<Grid Grid.Row="1" Grid.Column="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<Label Grid.Row="0" Grid.Column="0" Content="Selected sprite" HorizontalAlignment="Right"/>
+								<ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left"
+										  ItemsSource="{Binding AvailableSequences}" SelectedItem="{Binding SelectedSequence}">
+									<ComboBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding SequenceName}" />
+										</DataTemplate>
+									</ComboBox.ItemTemplate>
+								</ComboBox>
+							</Grid>
 						</Grid>
 					</GroupBox>
 				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-
-			<ItemsControl.Template>
-				<ControlTemplate TargetType="ItemsControl">
-					<ScrollViewer CanContentScroll="False" VerticalScrollBarVisibility="Visible">
-						<ItemsPresenter/>
-					</ScrollViewer>
-				</ControlTemplate>
-			</ItemsControl.Template>
-
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<VirtualizingStackPanel Orientation="Vertical"/>
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
-		</ItemsControl>
+			</ListView.ItemTemplate>
+		</ListView>
 	</Grid>
 </UserControl>

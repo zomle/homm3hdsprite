@@ -6,40 +6,6 @@ namespace SASpriteGen.ViewModel
 {
 	public class AnimationPreviewViewModel : ViewModel
 	{
-		private int frameWidth;
-		public int FrameWidth
-		{
-			get
-			{
-				return frameWidth;
-			}
-			set
-			{
-				if (frameWidth != value)
-				{
-					frameWidth = value;
-					NotifyPropertyChanged();
-				}
-			}
-		}
-
-		private int frameHeight;
-		public int FrameHeight
-		{
-			get
-			{
-				return frameHeight;
-			}
-			set
-			{
-				if (frameHeight != value)
-				{
-					frameHeight = value;
-					NotifyPropertyChanged();
-				}
-			}
-		}
-
 		private int currentPreviewFrameIndex;
 		public int CurrentPreviewFrameIndex
 		{
@@ -59,6 +25,22 @@ namespace SASpriteGen.ViewModel
 
 		public bool AnimationRunning { get; set; }
 
+		public int FrameWidth
+		{
+			get
+			{
+				return Data.Count > 0 ? Data[0].FramedImage.FrameWidth : 0;
+			}
+		}
+
+		public int FrameHeight
+		{
+			get
+			{
+				return Data.Count > 0 ? Data[0].FramedImage.FrameHeight : 0;
+			}
+		}
+
 		public ObservableCollection<SpriteFrameData> Data { get; set; }
 
 		public AnimationPreviewViewModel(ObservableCollection<SpriteFrameData> data) 
@@ -68,8 +50,24 @@ namespace SASpriteGen.ViewModel
 			AnimationRunning = false;
 		}
 
+		public AnimationPreviewViewModel Clone()
+		{
+			return new AnimationPreviewViewModel(new ObservableCollection<SpriteFrameData>(Data))
+			{
+				CurrentPreviewFrameIndex = 0,
+				AnimationRunning = true
+			};
+		}
+
+		private DateTime NextTick;
+
 		public void AnimationTick()
 		{
+			if (DateTime.Now < NextTick)
+			{
+				return;
+			}
+
 			if (!AnimationRunning)
 			{
 				return;
@@ -81,6 +79,7 @@ namespace SASpriteGen.ViewModel
 			}
 
 			StepPreviewFrame(1);
+			NextTick = DateTime.Now.AddMilliseconds(100);
 		}
 
 		public void StepPreviewFrame(int delta)

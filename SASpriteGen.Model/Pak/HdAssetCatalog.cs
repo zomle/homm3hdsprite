@@ -4,7 +4,6 @@ namespace SASpriteGen.Model.Pak
 {
 	public class HdAssetCatalog
 	{
-		//CNOSFE -> data
 		public Dictionary<string, HdAssetCatalogItem> Items { get; set; }
 
 		public HdAssetCatalog()

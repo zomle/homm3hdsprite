@@ -19,7 +19,6 @@ namespace SASpriteGen.Wpf.Converters
 		{
 			var parameterEnum = Enum.Parse<ActiveTab>((string)parameter);
 			return parameterEnum;
-			//throw new InvalidOperationException();
 		}
 	}
 }

@@ -254,7 +254,8 @@ namespace SASpriteGen.ViewModel
 			DefFiles.Clear();
 
 			var handler = new LodHandler(LodFilePath);
-			handler.LoadTableOfContents();
+			handler.LoadTableOfContents(ti => ti.FileType == (int)DefType.Creature);
+
 			LodTocItemCount = handler.TocItemCount;
 
 			foreach (var item in handler.LoadDefFiles())

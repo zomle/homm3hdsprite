@@ -3,47 +3,86 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SASpriteGen.Wpf"
-             mc:Ignorable="d" 
+             xmlns:local="clr-namespace:SASpriteGen.Wpf" xmlns:converter="clr-namespace:SASpriteGen.Wpf.Converters"
+			 mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<Style TargetType="Button">
 				<Setter Property="Margin" Value="4"/>
 			</Style>
+			<converter:ProgressForegroundConverter x:Key="ProgressForegroundConverter"/>
+			<converter:NegateBoolConverter x:Key="NegateBoolConverter"/>
 		</ResourceDictionary>
 	</UserControl.Resources>
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
+		<Grid Grid.Row="0" IsEnabled="{Binding SequencesLoaded}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
 				
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="Auto"/>
 			</Grid.ColumnDefinitions>
 
-			<Button Grid.Column="0" Content="Frame Width +" ToolTip="Increase frame width." Command="{Binding IncreaseFrameWidth}" />
-			<Button Grid.Column="1" Content="Frame Width -" ToolTip="Decrease frame width." Command="{Binding DecreaseFrameWidth}" />
+			<StackPanel Grid.Column="0" Orientation="Horizontal">
+				<TextBlock VerticalAlignment="Center" Margin="4">Frame width: </TextBlock>
+				<Button Margin="1,4" Padding="8,0"
+					Content="--" ToolTip="Decrease frame width by 5 pixels." 
+					Command="{Binding ChangeFrameWidth}" CommandParameter="-5" />
 
-			<Button Grid.Column="2" Content="Frame Height +" ToolTip="Increase frame height." Command="{Binding IncreaseFrameHeight}" Margin="10,4,4,4"></Button>
-			<Button Grid.Column="3" Content="Frame Height -" ToolTip="Decrease frame height." Command="{Binding DecreaseFrameHeight}"></Button>
+				<Button Margin="1,4" Padding="8,0"
+						Content="-" ToolTip="Decrease frame width by 1 pixel."
+						Command="{Binding ChangeFrameWidth}" CommandParameter="-1" />
 
-			<Button Grid.Column="4" Content="Scaling +" ToolTip="Increase image scaling by 1%." Command="{Binding IncreaseScaling}" Margin="10,4,4,4"></Button>
-			<Button Grid.Column="5" Content="Scaling -" ToolTip="Decrease image scaling by 1%." Command="{Binding DecreaseScaling}"></Button>
-			<Button Grid.Column="6" Content="Adjust frame size to scaling" ToolTip="Adjust frame width and height so that every animation can fit without clipping considering the current scaling." Command="{Binding RecalculateFrameSize}"></Button>
+				<Button Margin="5,4,1,4" Padding="8,0" 
+						Content="+" ToolTip="Increase frame width by 1 pixel."  
+						Command="{Binding ChangeFrameWidth}" CommandParameter="+1" />
+				
+				<Button Margin="1,4" Padding="8,0" 
+						Content="++" ToolTip="Increase frame width by 5 pixels." 
+						Command="{Binding ChangeFrameWidth}" CommandParameter="+5" />
+			</StackPanel>
 
-			<Button Grid.Column="8" Content="Reset" ToolTip="Reset frame width/height and scaling to the default." Command="{Binding ResetSizing}" />
+			<StackPanel Grid.Column="1" Margin="15,0" Orientation="Horizontal" >
+				<TextBlock VerticalAlignment="Center" Margin="4">Frame height:</TextBlock>
+				<Button Margin="1,4" Padding="8,0"
+					Content="--" ToolTip="Decrease frame height by 5 pixels." 
+					Command="{Binding ChangeFrameHeight}" CommandParameter="-5" />
+
+				<Button Margin="1,4" Padding="8,0"
+						Content="-" ToolTip="Decrease frame height by 1 pixel."
+						Command="{Binding ChangeFrameHeight}" CommandParameter="-1" />
+
+				<Button Margin="5,4,1,4" Padding="8,0" 
+						Content="+" ToolTip="Increase frame height by 1 pixel."  
+						Command="{Binding ChangeFrameHeight}" CommandParameter="+1" />
+
+				<Button Margin="1,4" Padding="8,0" 
+						Content="++" ToolTip="Increase frame height by 5 pixels." 
+						Command="{Binding ChangeFrameHeight}" CommandParameter="+5" />
+			</StackPanel>
+
+			<StackPanel Grid.Column="2" Margin="15,0" Orientation="Horizontal">
+				<TextBlock VerticalAlignment="Center" Margin="4">Scaling:</TextBlock>
+
+				<Button Margin="1,4" Padding="8,0"
+						Content="-" ToolTip="Decrease scaling by 1%."
+						Command="{Binding ChangeScaling}" CommandParameter="-0.01" />
+
+				<Button Margin="5,4,1,4" Padding="8,0" 
+						Content="+" ToolTip="Increase scaling by 1%."  
+						Command="{Binding ChangeScaling}" CommandParameter="+0.01" />
+			</StackPanel>
+
+			<Button Grid.Column="4" Content="Reset" ToolTip="Reset frame width/height and scaling to the default." Command="{Binding ResetSizing}" />
 		</Grid>
 
 		<StackPanel Grid.Row="1" Orientation="Horizontal">
@@ -62,11 +101,12 @@
 				<Run FontStyle="Italic" Text="{Binding Scaling}"></Run>
 			</TextBlock>
 		</StackPanel>
-		
-		<ItemsControl Grid.Row="2" ItemsSource="{Binding Sequences}">
+		<ProgressBar Grid.Row="2" Margin="3,0,3,3" Height="10" Maximum="{Binding FrameCount}" Value="{Binding FramesProcessed}"
+						 Foreground="{Binding Path=FrameLoadInProgress, Converter={StaticResource ProgressForegroundConverter}}"/>
+		<ItemsControl Grid.Row="3" ItemsSource="{Binding Sequences}">
 			<ItemsControl.ItemTemplate>
 				<DataTemplate>
-					<local:SpriteFrameSequence DataContext="{Binding}" Margin="0,10,0,0" />
+					<local:SpriteFrameSequence Margin="0,10,0,0" />
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 

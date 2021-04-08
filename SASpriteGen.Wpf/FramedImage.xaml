@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="SASpriteGen.Wpf.FramedImage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converter="clr-namespace:SASpriteGen.Wpf.Converters"
+			 xmlns:local="clr-namespace:SASpriteGen.Wpf"
+			 mc:Ignorable="d" d:DesignHeight="200" d:DesignWidth="200"
+			 Width="{Binding FrameWidth}"  Height="{Binding FrameHeight}" >
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="bool2vis" />
+		<converter:ValueMultiplierConverter x:Key="ValueMultiplierConverter" />		
+	</UserControl.Resources>
+	<Grid >
+		<Border BorderThickness="1"  BorderBrush="DarkGray"
+				Background="{Binding Path=DataContext.ImageBackgroundColor, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}, Mode=FindAncestor}}">
+			<Canvas ClipToBounds="True"
+					Width="{Binding FrameWidth}" 
+					Height="{Binding FrameHeight}">
+
+				<Image Stretch="None" Source="{Binding ImageStream}" >
+					<Image.ToolTip>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition />
+								<ColumnDefinition />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition />
+								<RowDefinition />
+							</Grid.RowDefinitions>
+							<TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,0" FontWeight="Bold" Text="Image Width:"/>
+							<TextBlock Grid.Row="0" Grid.Column="1" Margin="0" Text="{Binding Width}" />
+							<TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0" FontWeight="Bold" Text="Image Height:"/>
+							<TextBlock Grid.Row="1" Grid.Column="1" Margin="0" Text="{Binding Height}" />
+						</Grid>
+					</Image.ToolTip>
+					<Image.RenderTransform>
+						<TransformGroup>
+							<ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
+							<TranslateTransform X="{Binding OffsetX}" Y="{Binding OffsetY}" />
+						</TransformGroup>
+					</Image.RenderTransform>
+				</Image>
+
+				<Line Visibility="{Binding Path=DataContext.ShowCenterSeparator, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}, Mode=FindAncestor}, Converter={StaticResource bool2vis}}"
+					  X1="{Binding FrameWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}" 
+					  Y1="0"
+					  X2="{Binding FrameWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}" 
+					  Y2="{Binding FrameHeight}"
+					  Stroke="Red" StrokeDashArray="4 4"
+					  />
+			</Canvas>
+		</Border>
+	</Grid>
+</UserControl>

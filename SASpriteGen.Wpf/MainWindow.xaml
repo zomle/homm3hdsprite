@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SASpriteGen.Wpf" 
 		xmlns:converter="clr-namespace:SASpriteGen.Wpf.Converters"
-		mc:Ignorable="d"
-        Title="HOMM3 Sprite generator for Stream Avatar" Height="450" Width="800">
+		mc:Ignorable="d" Icon="PepoG.ico"
+        Title="HOMM3 HD sprite to Stream Avatars converter" 
+		Width="800" Height="450"
+		ResizeMode="CanResize" WindowStartupLocation="CenterScreen">
 	<Window.Resources>
 		<ResourceDictionary>
 			<converter:TabEnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+			<converter:ValueMultiplierConverter x:Key="ValueMultiplierConverter" />
 		</ResourceDictionary>
 	</Window.Resources>
 	<Grid>
@@ -17,7 +20,36 @@
 			<RowDefinition Height="30"/>
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
+		<Grid Grid.Row="0">
+			<StackPanel Orientation="Horizontal">
+				<TextBlock Margin="4" VerticalAlignment="Center">Show image center:</TextBlock>
+				
+				<CheckBox Margin="4" VerticalAlignment="Center"
+						  IsChecked="{Binding ShowCenterSeparator}" />
+				<TextBlock Margin="4" VerticalAlignment="Center">Preview image background: </TextBlock>
 
+				<Button Background="AntiqueWhite" Margin="4" Width="25"
+						Command="{Binding ChangeImageBackgroundColor}"
+						CommandParameter="AntiqueWhite" />
+				
+				<Button Background="White" Margin="4" Width="25"
+						Command="{Binding ChangeImageBackgroundColor}"
+						CommandParameter="White" />
+
+				<Button Background="DarkGray" Margin="4" Width="25"
+						Command="{Binding ChangeImageBackgroundColor}"
+						CommandParameter="DarkGray" />
+				
+				<Button Background="Gray" Margin="4" Width="25"
+						Command="{Binding ChangeImageBackgroundColor}"
+						CommandParameter="Gray" />
+
+				<Button Background="Black" Margin="4" Width="25"
+						Command="{Binding ChangeImageBackgroundColor}"
+						CommandParameter="Black" />
+
+			</StackPanel>
+		</Grid>
 		<TabControl Grid.Row="1">
 			<TabItem IsSelected="{Binding SelectedTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=AssetBrowser}">
 				<TabItem.Header>
@@ -39,13 +71,15 @@
 				</Grid>
 
 			</TabItem>
-			<TabItem IsSelected="{Binding SelectedTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Homm3HdSpriteSheet}">
+			<TabItem IsSelected="{Binding SelectedTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=Homm3HdSpriteSheet}"
+					 IsEnabled="{Binding Homm3HdSpriteSheet.SequencesLoaded}">
 				<TabItem.Header>
 					HOMM3 HD Sprites
 				</TabItem.Header>
 				<local:Homm3HdSpriteSheet DataContext="{Binding Homm3HdSpriteSheet}" />
 			</TabItem>
-			<TabItem IsSelected="{Binding SelectedTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=StreamAvatarsSpriteSheet}">
+			<TabItem IsSelected="{Binding SelectedTab, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter=StreamAvatarsSpriteSheet}"
+					 IsEnabled="{Binding Homm3HdSpriteSheet.SequencesLoaded}">
 				<TabItem.Header>
 					Stream Avatars Sprites
 				</TabItem.Header>

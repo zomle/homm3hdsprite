@@ -10,11 +10,8 @@ namespace SASpriteGen.Model.Pak
 	{
 		private HdAssetCatalog AssetCatalog { get; set; }
 
-		private static readonly Dictionary<string, MagickImage> DecompressedSheetCache;
-
 		static HdPakHandler()
 		{
-			DecompressedSheetCache = new Dictionary<string, MagickImage>();
 		}
 
 		public HdPakHandler()
@@ -89,16 +86,23 @@ namespace SASpriteGen.Model.Pak
 			return decompressed.ToArray();
 		}
 
-		private static MagickImage GetSpriteSheet(HdPakFrame frame)
+		private static MagickImage GetSpriteSheet(string sourceFilePath, int dataOffset, int dataLength)
 		{
-			return GetSpriteSheet(frame.SourceFilePath, frame.SheetDataOffset, frame.SheetCompressedLength);
+			using var fs = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read);
+			fs.Seek(dataOffset, SeekOrigin.Begin);
+
+			var compData = fs.ReadBytes(dataLength);
+			var decompressedImage = Decompress(compData);
+
+			var result = new MagickImage(decompressedImage, MagickFormat.Dds);
+			return result;
 		}
 
-		private static MagickImage GetSpriteSheet(string sourceFilePath, int dataOffset, int dataLength)
+		private static MagickImage GetSpriteSheet(Dictionary<string, MagickImage> cache, string sourceFilePath, int dataOffset, int dataLength)
 		{
 			var key = $"{sourceFilePath}|{dataOffset}";
 
-			if (!DecompressedSheetCache.TryGetValue(key, out var sheetImage))
+			if (!cache.TryGetValue(key, out var sheetImage))
 			{
 				using var fs = new FileStream(sourceFilePath, FileMode.Open, FileAccess.Read);
 				fs.Seek(dataOffset, SeekOrigin.Begin);
@@ -108,28 +112,43 @@ namespace SASpriteGen.Model.Pak
 
 				sheetImage = new MagickImage(decompressedImage, MagickFormat.Dds);
 
-				DecompressedSheetCache.Add(key, sheetImage);
+				cache.Add(key, sheetImage);
 			}
 
 			return sheetImage;
 		}
 
-		internal static MagickImage LoadFrame(HdPakFrame frame)
+		internal static void LoadFrames(HdAssetCatalogItem hdAssetCatalogItem, Action frameLoadedCallback)
 		{
-			var image = GetSpriteSheet(frame.SourceFilePath, frame.SheetDataOffset, frame.SheetCompressedLength);
+			var cache = new Dictionary<string, MagickImage>();
+			foreach (var frame in hdAssetCatalogItem.HdPakFrames.Values)
+			{
+				var sheet = GetSpriteSheet(cache, frame.SourceFilePath, frame.SheetDataOffset, frame.SheetCompressedLength);
 
-			var result = (MagickImage)image.Clone(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
-			result.Rotate(90.0 * frame.Metadata.Rotation);
-			//result.Resize(new Percentage(200.0 / frame.Metadata.Scaling));
-			
-			result.AdaptiveResize(new MagickGeometry(new Percentage(200.0 / frame.Metadata.Scaling), new Percentage(200.0 / frame.Metadata.Scaling)));
-			return result;
+				var frameImage = (MagickImage)sheet.Clone(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
+				frameImage.Rotate(90.0 * frame.Metadata.Rotation);
+
+				var scalingPercentage = new Percentage(200.0 / frame.Metadata.Scaling);
+				frameImage.AdaptiveResize(new MagickGeometry(scalingPercentage, scalingPercentage));
+
+				frame.Image = frameImage;
+
+				frameLoadedCallback();
+			}
+
+			foreach (var cacheItem in cache.Values)
+			{
+				cacheItem.Dispose();
+			}
 		}
 
 		public static Stream GetPreviewImage(HdPakFrame frame)
 		{
-			var previewImage = LoadFrame(frame);
-			previewImage.Resize(150, 150);
+			using var image = GetSpriteSheet(frame.SourceFilePath, frame.SheetDataOffset, frame.SheetCompressedLength);
+			using var previewImage = (MagickImage)image.Clone(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
+
+			previewImage.Rotate(90.0 * frame.Metadata.Rotation);
+			previewImage.AdaptiveResize(150, 150);
 
 			var result = new MemoryStream();
 			previewImage.Write(result, MagickFormat.Png);

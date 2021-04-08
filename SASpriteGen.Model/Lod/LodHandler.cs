@@ -5,7 +5,6 @@ using System.IO;
 
 namespace SASpriteGen.Model
 {
-
 	public class LodHandler
 	{
 		public int TocItemCount { get { return TableOfContents.Count; } }
@@ -19,10 +18,10 @@ namespace SASpriteGen.Model
 			LodPath = lodPath;
 		}
 
-		public void LoadTableOfContents()
+		public void LoadTableOfContents(Predicate<LodTocItem> loadPredicate)
 		{
 			using var fs = new FileStream(LodPath, FileMode.Open, FileAccess.Read);
-			TableOfContents = ReadToc(fs, 8);
+			TableOfContents = ReadToc(fs, 8, loadPredicate);
 		}
 
 		public IEnumerable<DefFile> LoadDefFiles()
@@ -67,7 +66,7 @@ namespace SASpriteGen.Model
 			return decompressed.ToArray();
 		}
 
-		static List<LodTocItem> ReadToc(FileStream fs, int startOffset)
+		static List<LodTocItem> ReadToc(FileStream fs, int startOffset, Predicate<LodTocItem> loadPredicate)
 		{
 			int tocSize = fs.ReadInt32(startOffset, SeekOrigin.Begin);
 			fs.Seek(80, SeekOrigin.Current);
@@ -78,7 +77,7 @@ namespace SASpriteGen.Model
 				var offset = fs.Position;
 
 				var item = new LodTocItem();
-				item.Name = fs.ReadString();
+				item.Name = fs.ReadString().ToUpperInvariant();
 
 				fs.Seek(offset + 16, SeekOrigin.Begin);
 				item.DataOffset = fs.ReadInt32();
@@ -86,7 +85,10 @@ namespace SASpriteGen.Model
 				item.FileType = fs.ReadInt32();
 				item.CompressedDataSize = fs.ReadInt32();
 
-				result.Add(item);
+				if (loadPredicate(item))
+				{
+					result.Add(item);
+				}
 			}
 
 			return result;

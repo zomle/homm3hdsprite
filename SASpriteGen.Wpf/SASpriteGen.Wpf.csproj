@@ -4,11 +4,27 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>PepoG.ico</ApplicationIcon>
+    <Authors>zomle</Authors>
+    <PackageIcon>PepoG.png</PackageIcon>
+    <Product>HOMM3 HD sprite to Stream Avatars converter</Product>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="PepoG.ico" />
+    <None Include="PepoG.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SASpriteGen.Model\SASpriteGen.Model.csproj" />
     <ProjectReference Include="..\SASpriteGen.ViewModel\SASpriteGen.ViewModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="PepoG.ico" />
   </ItemGroup>
 
 </Project>

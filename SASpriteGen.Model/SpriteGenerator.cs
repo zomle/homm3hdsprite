@@ -1,131 +1,60 @@
 ﻿using ImageMagick;
-using SASpriteGen.Model.Def;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 namespace SASpriteGen.Model
 {
 	public class SpriteGenerator
 	{
-		Dictionary<Animation, AnimationData> Animations;
-
-		public SpriteGenerator()
+		public MagickImage CreateSpriteSheet(SpriteSheet spriteSheet)
 		{
-			Animations = new Dictionary<Animation, AnimationData>();
-		}
+			var result = new MagickImage(MagickColors.Transparent, spriteSheet.TotalWidth, spriteSheet.TotalHeight);
 
-		
-
-		public void LoadImages(Animation animation, IEnumerable<string> filePaths)
-		{
-			var frameList = new AnimationData();
-
-			Animations[animation] = frameList;
-		}
-
-
-		public void LoadImages(Animation animation, string root, DefGroup defGroup)
-		{
-			var data = new AnimationData();
-
-			Animations[animation] = data;
-
-			int minLeft = int.MaxValue;
-			int minTop = int.MaxValue;
-
-			foreach (var item in defGroup.Items)
+			var currentYOffset = 0;
+			
+			foreach (var animation in spriteSheet.Animations)
 			{
-				var frameData = new FrameData();
-				var frameList = data.Frames;
-				frameData.NewImage = new MagickImage(Path.Combine(root, Path.GetFileNameWithoutExtension(item.FileName) + ".png"));
-				frameData.OldWidth = item.Width;
-				frameData.OldHeight = item.Height;
-				frameData.OldFrameWidth = item.FrameWidth;
-				frameData.OldFrameHeight = item.FrameHeight;
-				frameData.OldFrameLeft = item.FrameLeft;
-				frameData.OldFrameTop = item.FrameTop;
-
-				minLeft = Math.Min(minLeft, item.FrameLeft);
-				minTop = Math.Min(minTop, item.FrameTop);
-
-				frameList.Add(frameData);
-			}
-
-			foreach (var frame in data.Frames)
-			{
-				double widthRatio = (double)frame.NewImage.Width / frame.OldFrameWidth;
-				double heightRatio = (double)frame.NewImage.Height / frame.OldFrameHeight;
-				var xOffset = (int)((frame.OldFrameLeft - minLeft) * widthRatio);
-				var yOffset = (int)((frame.OldFrameTop - minTop) * heightRatio);
-
-				data.MaxWidth = Math.Max(frame.NewImage.Width + xOffset, data.MaxWidth);
-				data.MaxHeight = Math.Max(frame.NewImage.Height + yOffset, data.MaxHeight);
-
-				frame.AdjustedXOffset = xOffset;
-				frame.AdjustedYOffset = yOffset;
-			}
-
-		}
-
-		public (int, int) ReadSizes()
-		{
-			int minWidth = int.MaxValue;
-			int minHeight = int.MaxValue;
-
-			int maxWidth = int.MinValue;
-			int maxHeight = int.MinValue;
-
-			foreach (var animation in Animations)
-			{
-				foreach (var frame in animation.Value.Frames)
+				var currentXOffset = 0;
+				foreach (var frame in animation.Frames)
 				{
-					minWidth = frame.NewImage.Width < minWidth ? frame.NewImage.Width : minWidth;
-					maxWidth = frame.NewImage.Width > maxWidth ? frame.NewImage.Width : maxWidth;
+					using (var tmpImage = frame.SourceImage.Clone())
+					{
+						tmpImage.Resize(new Percentage(frame.Scale * 100));
+						int imgOffsetX = frame.OffsetX < 0 ? -frame.OffsetX : 0;
+						int imgOffsetY = frame.OffsetY < 0 ? -frame.OffsetY : 0;
 
-					minHeight = frame.NewImage.Height < minHeight ? frame.NewImage.Height : minHeight;
-					maxHeight = frame.NewImage.Height > maxHeight ? frame.NewImage.Height : maxHeight;
+						tmpImage.Crop(new MagickGeometry(imgOffsetX, imgOffsetY, frame.FrameWidth, frame.FrameHeight));
+						tmpImage.RePage();
+
+						result.Composite(tmpImage, currentXOffset + Math.Max(0, frame.OffsetX), currentYOffset + Math.Max(0, frame.OffsetY), CompositeOperator.Copy);
+					}
+					currentXOffset += frame.FrameWidth;
 				}
+				currentYOffset += animation.TotalHeight;
 			}
 
-			return (maxWidth, maxHeight);
-		}
-
-		public (int, int) ReadMaxSizes(Animation animation)
-		{
-			int minWidth = int.MaxValue;
-			int minHeight = int.MaxValue;
-
-			int maxWidth = int.MinValue;
-			int maxHeight = int.MinValue;
-
-			foreach (var frame in Animations[animation].Frames)
-			{
-				minWidth = frame.NewImage.Width < minWidth ? frame.NewImage.Width : minWidth;
-				maxWidth = frame.NewImage.Width > maxWidth ? frame.NewImage.Width : maxWidth;
-
-				minHeight = frame.NewImage.Height < minHeight ? frame.NewImage.Height : minHeight;
-				maxHeight = frame.NewImage.Height > maxHeight ? frame.NewImage.Height : maxHeight;
-			}
-			return (maxWidth, maxHeight);
-		}
-
-		public MagickImage CreateSpriteSheet(Animation animation)
-		{
-			var animationData = Animations[animation];
-			int frameCount = animationData.Frames.Count;
-
-			var result = new MagickImage(MagickColors.Transparent, frameCount * animationData.MaxWidth, animationData.MaxHeight);
-
-			for (int i = 0; i < frameCount; ++i)
-			{
-				var frame = animationData.Frames[i];
-				result.Composite(frame.NewImage, animationData.MaxWidth * i + frame.AdjustedXOffset, frame.AdjustedYOffset, CompositeOperator.Copy);
-			}
-
-			Console.WriteLine($"Frame count: {frameCount}; Frame width: {animationData.MaxWidth}; Frame height: {animationData.MaxHeight}");
 			return result;
+		}
+
+		public string CreateSpriteSheetInfo(SpriteSheet spriteSheet)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine($"Source creature id: {spriteSheet.SourceId}");
+			sb.AppendLine($"Source graphics scaling: {Math.Round(spriteSheet.Animations[0].Frames[0].Scale, 2)}");
+			sb.AppendLine($"Sprite sheet size: width: {spriteSheet.TotalWidth} x height: {spriteSheet.TotalHeight}");
+			sb.AppendLine($"Individual frame size: width: {spriteSheet.Animations[0].Frames[0].FrameWidth} x height: {spriteSheet.Animations[0].Frames[0].FrameHeight}");
+			sb.AppendLine();
+			foreach (var animation in spriteSheet.Animations)
+			{
+				sb.AppendLine($"Animation {animation.Name} (source: {animation.Source}):");
+				for (int i = 0; i < animation.Frames.Count; i++)
+				{
+					Frame frame = animation.Frames[i];
+					sb.AppendLine($"  Frame {i + 1}: Offset X: {frame.OffsetX}; Offset Y: {frame.OffsetY}");
+				}
+				sb.AppendLine();
+			}
+			return sb.ToString();
 		}
 	}
 }

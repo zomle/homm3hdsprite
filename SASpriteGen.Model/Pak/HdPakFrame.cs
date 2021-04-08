@@ -11,7 +11,7 @@ namespace SASpriteGen.Model.Pak
 
 		public ImageSliceInfo Metadata { get; private set; }
 
-		private MagickImage Image { get; set; }
+		public MagickImage Image { get; set; }
 
 		public HdPakFrame(string sourceFilePath, int sheetDataOffset, int sheetCompressedLength, ImageSliceInfo metadata)
 		{
@@ -21,14 +21,10 @@ namespace SASpriteGen.Model.Pak
 			Metadata = metadata;
 		}
 
-		public MagickImage GetImage()
+		public void DisposeImage()
 		{
-			if (Image == null)
-			{
-				Image = HdPakHandler.LoadFrame(this);
-			}
-
-			return Image;
+			Image?.Dispose();
+			Image = null;
 		}
 	}
 }

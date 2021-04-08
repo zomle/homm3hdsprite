@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace SASpriteGen.Wpf.Converters
 {
-	internal sealed class ScaledOffsetConverter : IMultiValueConverter
+	public class FrameIndexToVisibilityConverter : IMultiValueConverter
 	{
 		public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
 		{
-			double scale1 = System.Convert.ToDouble(values[0]);
-			double scale2 = System.Convert.ToDouble(values[1]);
-			double offset = System.Convert.ToDouble(values[2]);
-
-			return offset*scale1*scale2;// * scale;
+			return (int)values[0] == (int)values[1] ? Visibility.Visible : Visibility.Hidden;
 		}
 
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
