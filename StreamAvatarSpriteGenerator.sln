@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamAvatarSpriteGenerator", "StreamAvatarSpriteGenerator\StreamAvatarSpriteGenerator.csproj", "{18B45B95-4767-474E-87FC-632848BE8246}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SASpriteGen.Wpf", "SASpriteGen.Wpf\SASpriteGen.Wpf.csproj", "{EEA93B24-AEFD-4192-8EC5-FCB72441EA51}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SASpriteGen.ViewModel", "SASpriteGen.ViewModel\SASpriteGen.ViewModel.csproj", "{8EFDC4B2-E51F-405A-991A-C7E9401722BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SASpriteGen.Model", "SASpriteGen.Model\SASpriteGen.Model.csproj", "{C3B9DD2F-0CF1-4F66-82DE-279B1278CF03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{18B45B95-4767-474E-87FC-632848BE8246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18B45B95-4767-474E-87FC-632848BE8246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18B45B95-4767-474E-87FC-632848BE8246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18B45B95-4767-474E-87FC-632848BE8246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA93B24-AEFD-4192-8EC5-FCB72441EA51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA93B24-AEFD-4192-8EC5-FCB72441EA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA93B24-AEFD-4192-8EC5-FCB72441EA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA93B24-AEFD-4192-8EC5-FCB72441EA51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EFDC4B2-E51F-405A-991A-C7E9401722BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EFDC4B2-E51F-405A-991A-C7E9401722BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EFDC4B2-E51F-405A-991A-C7E9401722BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EFDC4B2-E51F-405A-991A-C7E9401722BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3B9DD2F-0CF1-4F66-82DE-279B1278CF03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3B9DD2F-0CF1-4F66-82DE-279B1278CF03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3B9DD2F-0CF1-4F66-82DE-279B1278CF03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3B9DD2F-0CF1-4F66-82DE-279B1278CF03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FFB0F557-EAB3-4847-982B-EFA18048E302}
+	EndGlobalSection
+EndGlobal

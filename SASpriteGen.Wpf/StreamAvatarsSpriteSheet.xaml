@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="SASpriteGen.Wpf.StreamAvatarsSpriteSheet"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SASpriteGen.Wpf" 
+			 xmlns:converter="clr-namespace:SASpriteGen.Wpf.Converters"
+			 mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<BooleanToVisibilityConverter x:Key="bool2vis" />
+			<converter:BottomCenterConverter x:Key="BottomCenterConverter" />
+			<converter:ScaledOffsetConverter x:Key="ScaledOffsetConverter" />
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="200" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		<GroupBox Grid.Row="0" Header="Preview">
+
+		</GroupBox>
+		<ItemsControl Grid.Row="1" ItemsSource="{Binding Sequences}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<GroupBox>
+						<GroupBox.Header>
+							<CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" IsEnabled="{Binding IsOptional}" />
+						</GroupBox.Header>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition />
+							</Grid.ColumnDefinitions>
+
+							<ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Data}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<Border Visibility="{Binding CurrentPreviewFrame, Converter={StaticResource bool2vis}}" BorderBrush="Black" Background="LemonChiffon" BorderThickness="1">
+											<Grid Width="{Binding DataContext.FrameWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+												  Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+												<Border BorderThickness="1"  BorderBrush="DarkGray">
+													<Canvas Width="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+															Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" >
+														<Image Stretch="None" Source="{Binding ImageStream}">
+															<Image.RenderTransform>
+																<TransformGroup>
+																	<ScaleTransform ScaleX="{Binding DataContext.ScaleX, RelativeSource={RelativeSource AncestorType=ItemsControl}}"  
+																	ScaleY="{Binding DataContext.ScaleY, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+																	<TranslateTransform>
+																		<TranslateTransform.X>
+																			<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
+																				<Binding Path="DataContext.ScaleX" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+																				<Binding Path="HighResScaleX" />
+																				<Binding Path="OffsetX" />
+																			</MultiBinding>
+																		</TranslateTransform.X>
+																		<TranslateTransform.Y>
+																			<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
+																				<Binding Path="DataContext.ScaleY" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+																				<Binding Path="HighResScaleY" />
+																				<Binding Path="OffsetY" />
+																			</MultiBinding>
+																		</TranslateTransform.Y>
+																	</TranslateTransform>
+																</TransformGroup>
+															</Image.RenderTransform>
+														</Image>
+													</Canvas>
+												</Border>
+											</Grid>
+										</Border>
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+
+								<ItemsControl.Template>
+									<ControlTemplate TargetType="ItemsControl">
+										<ScrollViewer CanContentScroll="False" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden" >
+											<Grid>
+												<ItemsPresenter />
+											</Grid>
+										</ScrollViewer>
+									</ControlTemplate>
+								</ItemsControl.Template>
+
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<Grid />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+							</ItemsControl>
+						</Grid>
+					</GroupBox>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+
+			<ItemsControl.Template>
+				<ControlTemplate TargetType="ItemsControl">
+					<ScrollViewer CanContentScroll="False" VerticalScrollBarVisibility="Visible">
+						<ItemsPresenter/>
+					</ScrollViewer>
+				</ControlTemplate>
+			</ItemsControl.Template>
+
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<VirtualizingStackPanel Orientation="Vertical"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+		</ItemsControl>
+	</Grid>
+</UserControl>

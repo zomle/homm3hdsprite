@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.23.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SASpriteGen.Model\SASpriteGen.Model.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,232 @@
+﻿<UserControl x:Class="SASpriteGen.Wpf.SpriteFrameSequence"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SASpriteGen.Wpf" 
+			 xmlns:converter="clr-namespace:SASpriteGen.Wpf.Converters"
+			 mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<BooleanToVisibilityConverter x:Key="bool2vis" />
+			<converter:BottomCenterConverter x:Key="BottomCenterConverter" />
+			<converter:ScaledOffsetConverter x:Key="ScaledOffsetConverter" />
+		</ResourceDictionary>
+	</UserControl.Resources>
+	<GroupBox Header="{Binding SequenceName}">
+		<Grid Background="AntiqueWhite">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition MinWidth="150" Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			
+			<ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Data}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Border Visibility="{Binding CurrentPreviewFrame, Converter={StaticResource bool2vis}}" BorderBrush="Black" Background="LemonChiffon" BorderThickness="1">
+							<Grid Width="{Binding DataContext.FrameWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+								  Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+								<Border BorderThickness="1"  BorderBrush="DarkGray">
+									<Canvas Width="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+											Height="{Binding DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}" >
+										<Image Stretch="None" Source="{Binding ImageStream}">
+											<Image.RenderTransform>
+												<TransformGroup>
+													<ScaleTransform ScaleX="{Binding ScaleX}"  
+																	ScaleY="{Binding ScaleY}" />
+													<TranslateTransform>
+														<TranslateTransform.X>
+															<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
+																<Binding Path="ScaleX" />
+																<Binding Path="HighResScaleX" />
+																<Binding Path="OffsetX" />
+															</MultiBinding>
+														</TranslateTransform.X>
+														<TranslateTransform.Y>
+															<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
+																<Binding Path="ScaleY" />
+																<Binding Path="HighResScaleY" />
+																<Binding Path="OffsetY" />
+															</MultiBinding>
+														</TranslateTransform.Y>
+													</TranslateTransform>
+												</TransformGroup>
+											</Image.RenderTransform>
+										</Image>
+									</Canvas>
+								</Border>
+							</Grid>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+
+				<ItemsControl.Template>
+					<ControlTemplate TargetType="ItemsControl">
+						<ScrollViewer CanContentScroll="False" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden" >
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<Grid Grid.Row="0" Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+
+									<Button Content="ᐸ"  Grid.Column="0" ToolTip="Pause animation and step to the previous frame."
+										Command="{Binding StepAnimationBackward}"
+										Margin="2,0,0,0" Padding="2,2"/>
+
+									<Button Content="ᐅ"  Grid.Column="1" ToolTip="Pause/resume animation."
+										Command="{Binding ToggleAnimation}"
+										Margin="2,0,0,0" Padding="4,2"/>
+
+									<Button Content="ᐳ"  Grid.Column="2" ToolTip="Pause animation and step to the next frame."
+										Command="{Binding StepAnimationForward}"
+										Margin="2,0,0,0" Padding="2,2"/>
+
+									<TextBlock Grid.Column="4" Margin="0,0,4,0" VerticalAlignment="Center">
+									<Run Text="Current Frame: " /><Run FontStyle="Italic" Text="{Binding CurrentPreviewFrameIndex}" />
+									</TextBlock>
+								</Grid>
+
+								<ItemsPresenter Grid.Row="1"/>
+							</Grid>
+						</ScrollViewer>
+					</ControlTemplate>
+				</ItemsControl.Template>
+
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Grid />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>
+
+			<ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Data}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Border BorderBrush="Black" Background="Gainsboro" BorderThickness="1" Margin="0">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
+
+								<Grid Grid.Row="0" VerticalAlignment="Center" Margin="2">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+
+									<TextBlock Text="{Binding FrameIndex}" ToolTip="Frame index" 
+										   FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0"/>
+
+									<Button Content="ᐸ" Grid.Column="2" ToolTip="Move image 1 pixel left."
+										Command="{Binding DataContext.DecreaseXOffset, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+										CommandParameter="{Binding}"
+										Margin="0" Padding="2" />
+
+									<Button Content="ᐳ"  Grid.Column="3" ToolTip="Move image 1 pixel right."
+										Command="{Binding DataContext.IncreaseXOffset, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+										CommandParameter="{Binding}"
+										Margin="2,0,0,0" Padding="2"/>
+
+									<Button Content="Reset"  Grid.Column="4"  ToolTip="Reset image positioning to default, read from Homm3 sprite definition."
+										Command="{Binding DataContext.ResetOffsets, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+										CommandParameter="{Binding}"
+										Margin="8,0,0,0" Padding="2"/>
+
+									<Button Content="ᐱ"  Grid.Column="5"  ToolTip="Move image 1 pixel up."
+										Command="{Binding DataContext.DecreaseYOffset, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+										CommandParameter="{Binding}"
+										Margin="8,0,0,0" Padding="2"/>
+
+									<Button Content="ᐯ"  Grid.Column="6" ToolTip="Move image 1 pixel down."
+										Command="{Binding DataContext.IncreaseYOffset, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+										CommandParameter="{Binding}"
+										Margin="2,0,0,0" Padding="2"/>
+
+									<TextBlock Grid.Column="8" VerticalAlignment="Center" ToolTip="Current X-Y offset for the image." >
+									<Run Text="(" /><!--
+									--><Run FontStyle="Italic" Text="{Binding OffsetX}" /><!--
+									--><Run Text="; "/><!--
+									--><Run FontStyle="Italic" Text="{Binding OffsetY}" /><!--
+									--><Run Text=")"/>
+									</TextBlock>
+								</Grid>
+
+								<Grid Grid.Row="1"
+								  Width="{Binding Path=DataContext.FrameWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+								  Height="{Binding Path=DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+									<Border BorderThickness="1" BorderBrush="DarkGray">
+										<Canvas Width="{Binding Path=DataContext.FrameWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+											Height="{Binding Path=DataContext.FrameHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+											ClipToBounds="True">
+											<Image Stretch="None" Source="{Binding ImageStream}" >
+
+												<Image.RenderTransform>
+													<TransformGroup>
+														<ScaleTransform ScaleX="{Binding Path=ScaleX}" 
+																		ScaleY="{Binding Path=ScaleY}" />
+														<TranslateTransform>
+															<TranslateTransform.X>
+																<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
+																	<Binding Path="ScaleX" />
+																	<Binding Path="HighResScaleX" />
+																	<Binding Path="OffsetX" />
+																</MultiBinding>
+															</TranslateTransform.X>
+															<TranslateTransform.Y>
+																<MultiBinding Converter="{StaticResource ScaledOffsetConverter}">
+																	<Binding Path="ScaleY" />
+																	<Binding Path="HighResScaleY" />
+																	<Binding Path="OffsetY" />
+																</MultiBinding>
+															</TranslateTransform.Y>
+														</TranslateTransform>
+													</TransformGroup>
+												</Image.RenderTransform>
+											</Image>
+										</Canvas>
+									</Border>
+								</Grid>
+							</Grid>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+
+				<ItemsControl.Template>
+					<ControlTemplate TargetType="ItemsControl">
+						<ScrollViewer CanContentScroll="False" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden">
+							<ItemsPresenter />
+						</ScrollViewer>
+					</ControlTemplate>
+				</ItemsControl.Template>
+
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<VirtualizingStackPanel Orientation="Horizontal"/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+			</ItemsControl>
+		</Grid>
+	</GroupBox>
+</UserControl>
