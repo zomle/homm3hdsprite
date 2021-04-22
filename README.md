@@ -50,8 +50,10 @@ the adjustment. The background of the frame can be changed, in some cases it's e
 
 The Stream Avatars(SA) avatars have 5 mandatory actions (idle, run, sit, stand, jump), and some optional, out of which we are 
 interested in one (attack). The tool automatically assigns the HOMM3 animations to the SA actions, and allows each actions to be 
-previewed. Even though the animations might look fine on their own, they might be misaligned compared to each other. It's possible 
-to adjust each frame at the same time, so when you toggle through idle/run/sit/etc. they look aligned.
+previewed. 
+
+Even though the animations might look fine on their own, they might be misaligned compared to each other. It's possible 
+to adjust the whole animation (all frames) at the same time, so when you toggle through idle/run/sit/etc. the animations look aligned.
 
 ![SA animations](https://github.com/zomle/homm3hdsprite/raw/master/Resources/scr06_saanimations1.png)
 
@@ -108,7 +110,7 @@ manner :)
 ### Development environment
 
 * I used *Visual Studio 2019 Community Edition* for development and WPF on *.NET 5.0*. 
-* I haven't tested it on earlier versions, but might work fine.
+* I haven't tested it on other versions, but might work fine.
 
 ## Authors
 
