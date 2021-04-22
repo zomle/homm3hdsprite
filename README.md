@@ -57,7 +57,7 @@ to adjust each frame at the same time, so when you toggle through idle/run/sit/e
 
 It's possible to assign any HOMM3 animation to any SA action:
 
-![HOMM3 animation to SA action](https://github.com/zomle/homm3hdsprite/raw/master/Resources/scr07_saanimationshdsprite.png)
+![HOMM3 animation to SA action](https://github.com/zomle/homm3hdsprite/raw/master/Resources/scr07_saanimationhdsprite.png)
 
 Frame size can also be adjusted here:
 
