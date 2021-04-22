@@ -8,6 +8,7 @@
     <Authors>zomle</Authors>
     <PackageIcon>PepoG.png</PackageIcon>
     <Product>HOMM3 HD sprite to Stream Avatars converter</Product>
+    <AssemblyName>H3HDSpriteGen</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
