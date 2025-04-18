@@ -7,7 +7,7 @@ namespace SASpriteGen.Model
 		public string Name { get; }
 		public string Source { get; }
 
-		public int TotalHeight
+		public uint TotalHeight
 		{
 			get
 			{
@@ -15,11 +15,11 @@ namespace SASpriteGen.Model
 			}
 		}
 
-		public int TotalWidth
+		public uint TotalWidth
 		{
 			get
 			{
-				return Frames.Count * Frames[0].FrameWidth;
+				return (uint)Frames.Count * Frames[0].FrameWidth;
 			}
 		}
 

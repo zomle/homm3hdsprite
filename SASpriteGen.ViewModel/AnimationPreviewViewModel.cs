@@ -25,7 +25,7 @@ namespace SASpriteGen.ViewModel
 
 		public bool AnimationRunning { get; set; }
 
-		public int FrameWidth
+		public uint FrameWidth
 		{
 			get
 			{
@@ -33,7 +33,7 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		public int FrameHeight
+		public uint FrameHeight
 		{
 			get
 			{

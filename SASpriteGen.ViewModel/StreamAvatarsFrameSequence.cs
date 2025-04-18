@@ -21,7 +21,7 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		public int FrameWidth
+		public uint FrameWidth
 		{
 			get
 			{
@@ -29,7 +29,7 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		public int FrameHeight
+		public uint FrameHeight
 		{
 			get
 			{
@@ -38,11 +38,11 @@ namespace SASpriteGen.ViewModel
 		}
 
 
-		public int FrameCount
+		public uint FrameCount
 		{
 			get
 			{
-				return AnimationPreview.Data.Count;
+				return (uint)AnimationPreview.Data.Count;
 			}
 		}
 

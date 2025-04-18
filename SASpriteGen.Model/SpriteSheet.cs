@@ -6,11 +6,11 @@ namespace SASpriteGen.Model
 	{
 		public string SourceId { get; }
 
-		public int TotalHeight
+		public uint TotalHeight
 		{
 			get
 			{
-				int totalHeight = 0;
+				uint totalHeight = 0;
 				foreach (var animation in Animations)
 				{
 					totalHeight += animation.TotalHeight;
@@ -19,11 +19,11 @@ namespace SASpriteGen.Model
 			}
 		}
 
-		public int TotalWidth
+		public uint TotalWidth
 		{
 			get
 			{
-				int maxWidth = 0;
+				uint maxWidth = 0;
 				foreach (var animation in Animations)
 				{
 					maxWidth = animation.TotalWidth > maxWidth ? animation.TotalWidth : maxWidth;

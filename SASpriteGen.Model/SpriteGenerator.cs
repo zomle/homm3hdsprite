@@ -24,13 +24,13 @@ namespace SASpriteGen.Model
 						int imgOffsetY = frame.OffsetY < 0 ? -frame.OffsetY : 0;
 
 						tmpImage.Crop(new MagickGeometry(imgOffsetX, imgOffsetY, frame.FrameWidth, frame.FrameHeight));
-						tmpImage.RePage();
+						tmpImage.ResetPage();
 
 						result.Composite(tmpImage, currentXOffset + Math.Max(0, frame.OffsetX), currentYOffset + Math.Max(0, frame.OffsetY), CompositeOperator.Copy);
 					}
-					currentXOffset += frame.FrameWidth;
+					currentXOffset += (int)frame.FrameWidth;
 				}
-				currentYOffset += animation.TotalHeight;
+				currentYOffset += (int)animation.TotalHeight;
 			}
 
 			return result;

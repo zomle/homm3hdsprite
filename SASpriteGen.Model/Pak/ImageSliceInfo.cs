@@ -6,8 +6,8 @@
 
 		public int X { get; set; }
 		public int Y { get; set; }
-		public int Width { get; set; }
-		public int Height { get; set; }
+		public uint Width { get; set; }
+		public uint Height { get; set; }
 		public int Rotation { get; set; }
 
 		public int Scaling { get; set; }

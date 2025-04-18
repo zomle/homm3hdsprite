@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace SASpriteGen.ViewModel
 {
-	
+
 	public class SpriteFrameSequenceViewModel : SynchedViewModel
 	{
 		private string sequenceName;
@@ -42,7 +42,7 @@ namespace SASpriteGen.ViewModel
 		public int FrameMinLeft { get; internal set; }
 		public int FrameMinTop { get; internal set; }
 
-		public SpriteFrameSequenceViewModel(Action<IEnumerable, object> registerCollectionSynchronization) 
+		public SpriteFrameSequenceViewModel(Action<IEnumerable, object> registerCollectionSynchronization)
 			: base(registerCollectionSynchronization)
 		{
 			Data = new ObservableCollection<SpriteFrameData>();
@@ -62,7 +62,7 @@ namespace SASpriteGen.ViewModel
 
 		private void AddNewFrame(FramedImageViewModel framedImage)
 		{
-			
+
 			Data.Add(new SpriteFrameData(Data.Count, framedImage));
 		}
 
@@ -91,17 +91,17 @@ namespace SASpriteGen.ViewModel
 			{
 				if (dx != 0)
 				{
-					data.FramedImage.FrameWidth += dx;
+					data.FramedImage.FrameWidth = (uint)Math.Max(0, data.FramedImage.FrameWidth + dx);
 				}
 
 				if (dy != 0)
 				{
-					data.FramedImage.FrameHeight += dy;
+					data.FramedImage.FrameHeight = (uint)Math.Max(0, data.FramedImage.FrameHeight + dy);
 				}
 			}
 		}
 
-		internal void AddNewFrame(DefGroupItem defItem, HdPakFrame frame, int targetFrameWidth, int targetFrameHeight, double scale)
+		internal void AddNewFrame(DefGroupItem defItem, HdPakFrame frame, uint targetFrameWidth, uint targetFrameHeight, double scale)
 		{
 			var framedImage = new FramedImageViewModel(defItem, frame.Image, Data.Count == 0 ? null : Data[0].FramedImage, scale)
 			{
@@ -112,7 +112,7 @@ namespace SASpriteGen.ViewModel
 			AddNewFrame(framedImage);
 		}
 
-		internal void ResetSizeAndScaling(int originalFrameWidth, int originalFrameHeight, double originalScale)
+		internal void ResetSizeAndScaling(uint originalFrameWidth, uint originalFrameHeight, double originalScale)
 		{
 			foreach (var data in Data)
 			{

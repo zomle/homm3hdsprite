@@ -6,14 +6,14 @@ namespace SASpriteGen.Model
 	{
 		public readonly MagickImage SourceImage;
 
-		public readonly int FrameWidth;
-		public readonly int FrameHeight;
+		public readonly uint FrameWidth;
+		public readonly uint FrameHeight;
 
 		public readonly int OffsetX;
 		public readonly int OffsetY;
 		public readonly double Scale;
 
-		public Frame(MagickImage sourceImage, int frameWidth, int frameHeight, int offsetX, int offsetY, double scale)
+		public Frame(MagickImage sourceImage, uint frameWidth, uint frameHeight, int offsetX, int offsetY, double scale)
 		{
 			SourceImage = sourceImage;
 			FrameWidth = frameWidth;

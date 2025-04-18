@@ -54,7 +54,7 @@ namespace SASpriteGen.ViewModel
 
 		public ObservableCollection<StreamAvatarsAvatarAction> AvatarActions { get; set; }
 
-		public int FrameWidth
+		public uint FrameWidth
 		{
 			get
 			{
@@ -67,7 +67,7 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		public int FrameHeight
+		public uint FrameHeight
 		{
 			get
 			{
@@ -79,11 +79,11 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		public int SpriteSheetWidth
+		public uint SpriteSheetWidth
 		{
 			get
 			{
-				int maxWidth = 0;
+				var maxWidth = 0u;
 				foreach (var avatarAction in AvatarActions)
 				{
 					if (avatarAction.SelectedSequence == null)
@@ -92,7 +92,7 @@ namespace SASpriteGen.ViewModel
 					}
 
 					var sequence = avatarAction.SelectedSequence;
-					int tmpWidth = sequence.FrameWidth * sequence.FrameCount;
+					var tmpWidth = sequence.FrameWidth * sequence.FrameCount;
 
 					maxWidth = maxWidth > tmpWidth ? maxWidth : tmpWidth;
 				}
@@ -105,11 +105,11 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		public int SpriteSheetHeight 
+		public uint SpriteSheetHeight 
 		{
 			get
 			{
-				int maxHeight = 0;
+				var maxHeight = 0u;
 				foreach (var avatarAction in AvatarActions)
 				{
 					if (avatarAction.SelectedSequence == null || !avatarAction.IsSelected)
@@ -191,7 +191,7 @@ namespace SASpriteGen.ViewModel
 				int diffHeight = -minYOffset;
 
 				int diffLeft = minXOffset;
-				int diffRight = FrameWidth - maxXOffset;
+				int diffRight = (int)FrameWidth - maxXOffset;
 				int diffWidth = 0;
 
 				if (diffLeft<0 || diffRight < 0)

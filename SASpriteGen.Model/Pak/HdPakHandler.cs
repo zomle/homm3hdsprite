@@ -67,8 +67,8 @@ namespace SASpriteGen.Model.Pak
 					Name = tokens[0],
 					X = int.Parse(tokens[6]),
 					Y = int.Parse(tokens[7]),
-					Width = int.Parse(tokens[8]),
-					Height = int.Parse(tokens[9]),
+					Width = uint.Parse(tokens[8]),
+					Height = uint.Parse(tokens[9]),
 					Rotation = int.Parse(tokens[10]),
 					Scaling = scaling
 				};
@@ -125,7 +125,7 @@ namespace SASpriteGen.Model.Pak
 			{
 				var sheet = GetSpriteSheet(cache, frame.SourceFilePath, frame.SheetDataOffset, frame.SheetCompressedLength);
 
-				var frameImage = (MagickImage)sheet.Clone(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
+				var frameImage = (MagickImage)sheet.CloneArea(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
 				frameImage.Rotate(90.0 * frame.Metadata.Rotation);
 
 				var scalingPercentage = new Percentage(200.0 / frame.Metadata.Scaling);
@@ -145,7 +145,7 @@ namespace SASpriteGen.Model.Pak
 		public static Stream GetPreviewImage(HdPakFrame frame)
 		{
 			using var image = GetSpriteSheet(frame.SourceFilePath, frame.SheetDataOffset, frame.SheetCompressedLength);
-			using var previewImage = (MagickImage)image.Clone(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
+			using var previewImage = (MagickImage)image.CloneArea(frame.Metadata.X, frame.Metadata.Y, frame.Metadata.Width, frame.Metadata.Height);
 
 			previewImage.Rotate(90.0 * frame.Metadata.Rotation);
 			previewImage.AdaptiveResize(150, 150);

@@ -12,17 +12,17 @@ namespace SASpriteGen.ViewModel
 {
 	public class Homm3HdSpriteSheetViewModel : SynchedViewModel
 	{
-		public int OriginalFrameWidth { get; set; }
-		public int OriginalFrameHeight { get; set; }
+		public uint OriginalFrameWidth { get; set; }
+		public uint OriginalFrameHeight { get; set; }
 		public double OriginalScale { get; set; }
 
-		public int FrameWidth
+		public uint FrameWidth
 		{
 			get { return Sequences.Count == 0 || Sequences[0].Data.Count == 0 ? 0 : Sequences[0].Data[0].FramedImage.FrameWidth; }
 			set { throw new InvalidOperationException(); }
 		}
 
-		public int FrameHeight
+		public uint FrameHeight
 		{
 			get { return Sequences.Count == 0 || Sequences[0].Data.Count == 0 ? 0 : Sequences[0].Data[0].FramedImage.FrameHeight; }
 			set { throw new InvalidOperationException(); }
@@ -159,8 +159,8 @@ namespace SASpriteGen.ViewModel
 				{
 					foreach (var data in sequence.Data)
 					{
-						var left = (int)(data.FramedImage.OffsetX - data.FramedImage.Width/2 * data.FramedImage.Scale);
-						var right = (int)(data.FramedImage.OffsetX + data.FramedImage.Width/2 * data.FramedImage.Scale);
+						var left = (int)(data.FramedImage.OffsetX - data.FramedImage.Width / 2 * data.FramedImage.Scale);
+						var right = (int)(data.FramedImage.OffsetX + data.FramedImage.Width / 2 * data.FramedImage.Scale);
 
 						var bottom = (int)(data.FramedImage.OffsetY + data.FramedImage.Height * data.FramedImage.Scale);
 						var top = (int)(data.FramedImage.OffsetY);
@@ -173,8 +173,8 @@ namespace SASpriteGen.ViewModel
 					}
 				}
 
-				var maxWidth = rightest - leftest;
-				var maxHeight = bottomest - topest;
+				var maxWidth = (uint)Math.Max(0, rightest - leftest);
+				var maxHeight = (uint)Math.Max(0, bottomest - topest);
 
 				Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.FrameWidth = maxWidth));
 				Sequences.ForAll(s => s.Data.ForAll(d => d.FramedImage.FrameHeight = maxHeight));
@@ -243,7 +243,7 @@ namespace SASpriteGen.ViewModel
 				foreach (var item in group.Value.Items)
 				{
 					var frame = catalogItem.GetFrameForFileName(item.FileName);
-					if (frame == null) 
+					if (frame == null)
 					{
 						continue;
 					}

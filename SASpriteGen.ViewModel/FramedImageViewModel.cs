@@ -26,8 +26,8 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		private int frameWidth;
-		public int FrameWidth
+		private uint frameWidth;
+		public uint FrameWidth
 		{
 			get
 			{
@@ -46,8 +46,8 @@ namespace SASpriteGen.ViewModel
 			}
 		}
 
-		private int frameHeight;
-		public int FrameHeight
+		private uint frameHeight;
+		public uint FrameHeight
 		{
 			get
 			{
